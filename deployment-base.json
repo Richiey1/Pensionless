@@ -1,0 +1,10 @@
+{
+  "network": "base",
+  "chainId": 8453,
+  "deployer": "0xC1e4453d98fEe92504A2dC2114e6613053880A30",
+  "timestamp": "2025-12-29T15:30:57.959Z",
+  "contracts": {
+    "ProofOfClaimNFT": "0xc319b525592725194cA6254EE09866AA7b1bD5Ab",
+    "DeadmanVaultFactory": "0x025800b47F319C87091b455814475c496DC72219"
+  }
+}

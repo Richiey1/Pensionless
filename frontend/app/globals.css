@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Blue Primary Colors */
+  --color-blue-deep: #0F172A;
+  --color-blue-royal: #3B82F6;
+  --color-blue-sky: #60A5FA;
+
+  /* Mint/Teal Accent Colors */
+  --color-teal-deep: #14B8A6;
+  --color-mint: #5EEAD4;
+  --color-mint-light: #99F6E4;
+
+  /* Neutral Colors */
+  --color-dark-bg: #0F172A;
+  --color-dark-secondary: #1E293B;
+  --color-light-text: #F9FAFB;
+  --color-grey-medium: #6B7280;
+  --color-grey-light: #9CA3AF;
+
+  /* Highlight */
+  --color-gold: #FFD700;
+
+  /* Semantic Colors */
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+}
+
+body {
+  font-family: var(--font-geist-sans);
+  background-color: var(--color-dark-bg);
+  color: var(--color-light-text);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-dark-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-blue-royal);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-blue-sky);
+}
+
+/* Gradient Backgrounds */
+.gradient-blue-mint {
+  background: linear-gradient(135deg, var(--color-blue-deep) 0%, var(--color-teal-deep) 100%);
+}
+
+.gradient-blue {
+  background: linear-gradient(135deg, var(--color-blue-deep) 0%, var(--color-blue-sky) 100%);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
