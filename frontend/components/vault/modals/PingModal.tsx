@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useWaitForTransactionReceipt } from 'wagmi';
 import { useDeadmanVault } from '@/hooks/useDeadmanVault';
+import { useToast } from '@/context/ToastContext';
 import { type Address } from 'viem';
 import { NETWORK_CONFIG } from '@/config/constants';
 
@@ -13,6 +14,7 @@ interface PingModalProps {
 
 export default function PingModal({ vaultAddress, onClose }: PingModalProps) {
   const { ping, hash, isPending, isSuccess, error } = useDeadmanVault(vaultAddress);
+  const { addToast } = useToast();
 
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
     hash,
@@ -20,11 +22,31 @@ export default function PingModal({ vaultAddress, onClose }: PingModalProps) {
 
   const isLoading = isPending || isConfirming;
 
+  // Show toast notifications
+  useEffect(() => {
+    if (isConfirmed) {
+      addToast('Vault pinged successfully! Timer reset', 'success');
+    }
+  }, [isConfirmed, addToast]);
+
+  useEffect(() => {
+    if (error) {
+      addToast(`Error: ${error.message}`, 'error', 5000);
+    }
+  }, [error, addToast]);
+
+  useEffect(() => {
+    if (isPending) {
+      addToast('Transaction pending...', 'info', 0);
+    }
+  }, [isPending, addToast]);
+
   const handlePing = async () => {
     try {
       await ping();
     } catch (err) {
       console.error('Error pinging:', err);
+      addToast('Failed to ping vault', 'error', 5000);
     }
   };
 
@@ -58,12 +80,6 @@ export default function PingModal({ vaultAddress, onClose }: PingModalProps) {
           </div>
         ) : (
           <div className="space-y-4">
-            {error && (
-              <div className="p-3 bg-red-500/20 border border-red-500/50 rounded-lg">
-                <p className="text-sm text-red-300">{error.message}</p>
-              </div>
-            )}
-
             <div className="p-4 bg-[#1E293B] border border-[#14B8A6]/20 rounded-lg">
               <p className="text-gray-300">
                 Ping to reset your deadman timer. This confirms that you're still active and prevents your beneficiary from claiming the vault.

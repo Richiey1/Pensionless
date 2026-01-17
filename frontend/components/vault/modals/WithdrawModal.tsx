@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useWaitForTransactionReceipt } from 'wagmi';
 import { useDeadmanVault, useVaultBalance } from '@/hooks/useDeadmanVault';
+import { useToast } from '@/context/ToastContext';
 import { parseEther, formatEther, type Address } from 'viem';
 import { NETWORK_CONFIG } from '@/config/constants';
 
@@ -15,6 +16,7 @@ export default function WithdrawModal({ vaultAddress, onClose }: WithdrawModalPr
   const [amount, setAmount] = useState('');
   const { balance, isLoading: isLoadingBalance } = useVaultBalance(vaultAddress);
   const { withdraw, hash, isPending, isSuccess, error } = useDeadmanVault(vaultAddress);
+  const { addToast } = useToast();
 
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
     hash,
@@ -23,14 +25,33 @@ export default function WithdrawModal({ vaultAddress, onClose }: WithdrawModalPr
   const isLoading = isPending || isConfirming || isLoadingBalance;
   const maxBalance = balance ? formatEther(balance) : '0';
 
+  // Show toast notifications
+  useEffect(() => {
+    if (isConfirmed) {
+      addToast(`Successfully withdrew ${amount} ETH`, 'success');
+    }
+  }, [isConfirmed, amount, addToast]);
+
+  useEffect(() => {
+    if (error) {
+      addToast(`Error: ${error.message}`, 'error', 5000);
+    }
+  }, [error, addToast]);
+
+  useEffect(() => {
+    if (isPending) {
+      addToast('Transaction pending...', 'info', 0);
+    }
+  }, [isPending, addToast]);
+
   const handleWithdraw = async () => {
     if (!amount || parseFloat(amount) <= 0) {
-      alert('Please enter a valid amount');
+      addToast('Please enter a valid amount', 'warning');
       return;
     }
 
     if (balance && parseEther(amount) > balance) {
-      alert('Amount exceeds vault balance');
+      addToast('Amount exceeds vault balance', 'error');
       return;
     }
 
@@ -38,6 +59,7 @@ export default function WithdrawModal({ vaultAddress, onClose }: WithdrawModalPr
       await withdraw(parseEther(amount));
     } catch (err) {
       console.error('Error withdrawing:', err);
+      addToast('Failed to initiate withdrawal', 'error', 5000);
     }
   };
 
@@ -71,12 +93,6 @@ export default function WithdrawModal({ vaultAddress, onClose }: WithdrawModalPr
           </div>
         ) : (
           <div className="space-y-4">
-            {error && (
-              <div className="p-3 bg-red-500/20 border border-red-500/50 rounded-lg">
-                <p className="text-sm text-red-300">{error.message}</p>
-              </div>
-            )}
-
             <div className="p-3 bg-[#1E293B] border border-[#3B82F6]/20 rounded-lg">
               <p className="text-sm text-gray-400">Available Balance</p>
               <p className="text-lg font-semibold text-[#5EEAD4]">{isLoadingBalance ? '...' : maxBalance} ETH</p>

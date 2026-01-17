@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useWaitForTransactionReceipt } from 'wagmi';
 import { useDeadmanVault } from '@/hooks/useDeadmanVault';
+import { useToast } from '@/context/ToastContext';
 import { parseEther, isAddress, type Address } from 'viem';
 import { NETWORK_CONFIG } from '@/config/constants';
 
@@ -14,6 +15,7 @@ interface DepositModalProps {
 export default function DepositModal({ vaultAddress, onClose }: DepositModalProps) {
   const [amount, setAmount] = useState('');
   const { deposit, hash, isPending, isSuccess, error } = useDeadmanVault(vaultAddress);
+  const { addToast } = useToast();
 
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
     hash,
@@ -21,9 +23,28 @@ export default function DepositModal({ vaultAddress, onClose }: DepositModalProp
 
   const isLoading = isPending || isConfirming;
 
+  // Show toast notifications for state changes
+  useEffect(() => {
+    if (isConfirmed) {
+      addToast(`Successfully deposited ${amount} ETH`, 'success');
+    }
+  }, [isConfirmed, amount, addToast]);
+
+  useEffect(() => {
+    if (error) {
+      addToast(`Error: ${error.message}`, 'error', 5000);
+    }
+  }, [error, addToast]);
+
+  useEffect(() => {
+    if (isPending) {
+      addToast('Transaction pending...', 'info', 0);
+    }
+  }, [isPending, addToast]);
+
   const handleDeposit = async () => {
     if (!amount || parseFloat(amount) <= 0) {
-      alert('Please enter a valid amount');
+      addToast('Please enter a valid amount', 'warning');
       return;
     }
 
@@ -31,6 +52,7 @@ export default function DepositModal({ vaultAddress, onClose }: DepositModalProp
       await deposit(amount);
     } catch (err) {
       console.error('Error depositing:', err);
+      addToast('Failed to initiate deposit', 'error', 5000);
     }
   };
 
@@ -64,12 +86,6 @@ export default function DepositModal({ vaultAddress, onClose }: DepositModalProp
           </div>
         ) : (
           <div className="space-y-4">
-            {error && (
-              <div className="p-3 bg-red-500/20 border border-red-500/50 rounded-lg">
-                <p className="text-sm text-red-300">{error.message}</p>
-              </div>
-            )}
-
             <div>
               <label className="block text-sm font-semibold text-gray-300 mb-2">
                 Amount (ETH)

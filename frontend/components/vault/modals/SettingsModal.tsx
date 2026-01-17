@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useWaitForTransactionReceipt } from 'wagmi';
 import { useDeadmanVault, useVaultState } from '@/hooks/useDeadmanVault';
+import { useToast } from '@/context/ToastContext';
 import { isAddress, type Address } from 'viem';
 import { NETWORK_CONFIG } from '@/config/constants';
 
@@ -16,6 +17,7 @@ type SettingType = 'beneficiary' | 'timeout' | null;
 export default function SettingsModal({ vaultAddress, onClose }: SettingsModalProps) {
   const { vaultState, isLoading: isLoadingVault } = useVaultState(vaultAddress);
   const { setBeneficiary, setTimeout: setTimeoutFn, hash, isPending, error } = useDeadmanVault(vaultAddress);
+  const { addToast } = useToast();
   
   const [activeSetting, setActiveSetting] = useState<SettingType>(null);
   const [beneficiaryInput, setBeneficiaryInput] = useState('');
@@ -27,9 +29,32 @@ export default function SettingsModal({ vaultAddress, onClose }: SettingsModalPr
 
   const isLoading = isPending || isConfirming || isLoadingVault;
 
+  // Show toast notifications
+  useEffect(() => {
+    if (isConfirmed) {
+      if (activeSetting === 'beneficiary') {
+        addToast('Beneficiary updated successfully', 'success');
+      } else if (activeSetting === 'timeout') {
+        addToast('Timeout updated successfully', 'success');
+      }
+    }
+  }, [isConfirmed, activeSetting, addToast]);
+
+  useEffect(() => {
+    if (error) {
+      addToast(`Error: ${error.message}`, 'error', 5000);
+    }
+  }, [error, addToast]);
+
+  useEffect(() => {
+    if (isPending) {
+      addToast('Transaction pending...', 'info', 0);
+    }
+  }, [isPending, addToast]);
+
   const handleSetBeneficiary = async () => {
     if (!isAddress(beneficiaryInput)) {
-      alert('Please enter a valid Ethereum address');
+      addToast('Please enter a valid Ethereum address', 'warning');
       return;
     }
 
@@ -39,12 +64,13 @@ export default function SettingsModal({ vaultAddress, onClose }: SettingsModalPr
       setActiveSetting(null);
     } catch (err) {
       console.error('Error setting beneficiary:', err);
+      addToast('Failed to set beneficiary', 'error', 5000);
     }
   };
 
   const handleSetTimeout = async () => {
     if (!timeoutInput || isNaN(Number(timeoutInput)) || Number(timeoutInput) <= 0) {
-      alert('Please enter a valid timeout in seconds');
+      addToast('Please enter a valid timeout in seconds', 'warning');
       return;
     }
 
@@ -54,6 +80,7 @@ export default function SettingsModal({ vaultAddress, onClose }: SettingsModalPr
       setActiveSetting(null);
     } catch (err) {
       console.error('Error setting timeout:', err);
+      addToast('Failed to set timeout', 'error', 5000);
     }
   };
 
@@ -93,12 +120,6 @@ export default function SettingsModal({ vaultAddress, onClose }: SettingsModalPr
           </div>
         ) : (
           <div className="space-y-4">
-            {error && (
-              <div className="p-3 bg-red-500/20 border border-red-500/50 rounded-lg">
-                <p className="text-sm text-red-300">{error.message}</p>
-              </div>
-            )}
-
             {/* Current Settings */}
             {vaultState && (
               <div className="space-y-3">
