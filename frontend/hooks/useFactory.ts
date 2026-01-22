@@ -1,4 +1,8 @@
-import { useReadContract, useWriteContract, useWatchContractEvent } from "wagmi";
+import {
+  useReadContract,
+  useWriteContract,
+  useWatchContractEvent,
+} from "wagmi";
 import { DeadmanVaultFactoryABI } from "@/lib/abi/DeadmanVaultFactory";
 import { FACTORY_ADDRESS } from "@/config/constants";
 import type { Address } from "viem";
@@ -8,7 +12,13 @@ import type { Address } from "viem";
  */
 export function useFactory() {
   // Write functions
-  const { writeContract, data: hash, isPending, isSuccess, error } = useWriteContract();
+  const {
+    writeContract,
+    data: hash,
+    isPending,
+    isSuccess,
+    error,
+  } = useWriteContract();
 
   /**
    * Create a new vault
@@ -37,7 +47,12 @@ export function useFactory() {
  * Hook to get user's vaults from the factory
  */
 export function useUserVaults(userAddress?: Address) {
-  const { data: vaults, isLoading, error, refetch } = useReadContract({
+  const {
+    data: vaults,
+    isLoading,
+    error,
+    refetch,
+  } = useReadContract({
     address: FACTORY_ADDRESS,
     abi: DeadmanVaultFactoryABI,
     functionName: "getUserVaults",
@@ -59,7 +74,11 @@ export function useUserVaults(userAddress?: Address) {
  * Hook to get total number of vaults created
  */
 export function useTotalVaults() {
-  const { data: totalVaults, isLoading, error } = useReadContract({
+  const {
+    data: totalVaults,
+    isLoading,
+    error,
+  } = useReadContract({
     address: FACTORY_ADDRESS,
     abi: DeadmanVaultFactoryABI,
     functionName: "getTotalVaults",
@@ -76,7 +95,11 @@ export function useTotalVaults() {
  * Hook to get vault count for a specific user
  */
 export function useUserVaultCount(userAddress?: Address) {
-  const { data: vaultCount, isLoading, error } = useReadContract({
+  const {
+    data: vaultCount,
+    isLoading,
+    error,
+  } = useReadContract({
     address: FACTORY_ADDRESS,
     abi: DeadmanVaultFactoryABI,
     functionName: "getUserVaultCount",
@@ -119,7 +142,11 @@ export function useTimeoutLimits() {
  * Hook to get vault owner
  */
 export function useVaultOwner(vaultAddress?: Address) {
-  const { data: owner, isLoading, error } = useReadContract({
+  const {
+    data: owner,
+    isLoading,
+    error,
+  } = useReadContract({
     address: FACTORY_ADDRESS,
     abi: DeadmanVaultFactoryABI,
     functionName: "getVaultOwner",
@@ -140,7 +167,12 @@ export function useVaultOwner(vaultAddress?: Address) {
  * Hook to watch for VaultCreated events
  */
 export function useWatchVaultCreated(
-  onVaultCreated: (owner: Address, vault: Address, beneficiary: Address, timeout: bigint) => void
+  onVaultCreated: (
+    owner: Address,
+    vault: Address,
+    beneficiary: Address,
+    timeout: bigint
+  ) => void
 ) {
   useWatchContractEvent({
     address: FACTORY_ADDRESS,
@@ -148,8 +180,18 @@ export function useWatchVaultCreated(
     eventName: "VaultCreated",
     onLogs(logs) {
       logs.forEach((log) => {
-        if (log.args.owner && log.args.vault && log.args.beneficiary && log.args.timeout) {
-          onVaultCreated(log.args.owner, log.args.vault, log.args.beneficiary, log.args.timeout);
+        if (
+          log.args.owner &&
+          log.args.vault &&
+          log.args.beneficiary &&
+          log.args.timeout
+        ) {
+          onVaultCreated(
+            log.args.owner,
+            log.args.vault,
+            log.args.beneficiary,
+            log.args.timeout
+          );
         }
       });
     },

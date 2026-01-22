@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useWaitForTransactionReceipt } from 'wagmi';
-import { useDeadmanVault } from '@/hooks/useDeadmanVault';
-import { useToast } from '@/context/ToastContext';
-import { type Address } from 'viem';
-import { NETWORK_CONFIG } from '@/config/constants';
+import { useState, useEffect } from "react";
+import { useWaitForTransactionReceipt } from "wagmi";
+import { useDeadmanVault } from "@/hooks/useDeadmanVault";
+import { useToast } from "@/context/ToastContext";
+import { type Address } from "viem";
+import { NETWORK_CONFIG } from "@/config/constants";
 
 interface PingModalProps {
   vaultAddress: Address;
@@ -13,31 +13,33 @@ interface PingModalProps {
 }
 
 export default function PingModal({ vaultAddress, onClose }: PingModalProps) {
-  const { ping, hash, isPending, isSuccess, error } = useDeadmanVault(vaultAddress);
+  const { ping, hash, isPending, isSuccess, error } =
+    useDeadmanVault(vaultAddress);
   const { addToast } = useToast();
 
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
-    hash,
-  });
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({
+      hash,
+    });
 
   const isLoading = isPending || isConfirming;
 
   // Show toast notifications
   useEffect(() => {
     if (isConfirmed) {
-      addToast('Vault pinged successfully! Timer reset', 'success');
+      addToast("Vault pinged successfully! Timer reset", "success");
     }
   }, [isConfirmed, addToast]);
 
   useEffect(() => {
     if (error) {
-      addToast(`Error: ${error.message}`, 'error', 5000);
+      addToast(`Error: ${error.message}`, "error", 5000);
     }
   }, [error, addToast]);
 
   useEffect(() => {
     if (isPending) {
-      addToast('Transaction pending...', 'info', 0);
+      addToast("Transaction pending...", "info", 0);
     }
   }, [isPending, addToast]);
 
@@ -45,8 +47,8 @@ export default function PingModal({ vaultAddress, onClose }: PingModalProps) {
     try {
       await ping();
     } catch (err) {
-      console.error('Error pinging:', err);
-      addToast('Failed to ping vault', 'error', 5000);
+      console.error("Error pinging:", err);
+      addToast("Failed to ping vault", "error", 5000);
     }
   };
 
@@ -69,7 +71,9 @@ export default function PingModal({ vaultAddress, onClose }: PingModalProps) {
             <div className="p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-center">
               <div className="text-4xl mb-2">✓</div>
               <p className="text-green-300 font-semibold">Ping Successful!</p>
-              <p className="text-sm text-green-200 mt-2">Your deadman timer has been reset</p>
+              <p className="text-sm text-green-200 mt-2">
+                Your deadman timer has been reset
+              </p>
             </div>
             <button
               onClick={onClose}
@@ -82,7 +86,9 @@ export default function PingModal({ vaultAddress, onClose }: PingModalProps) {
           <div className="space-y-4">
             <div className="p-4 bg-[#1E293B] border border-[#14B8A6]/20 rounded-lg">
               <p className="text-gray-300">
-                Ping to reset your deadman timer. This confirms that you're still active and prevents your beneficiary from claiming the vault.
+                Ping to reset your deadman timer. This confirms that you're
+                still active and prevents your beneficiary from claiming the
+                vault.
               </p>
             </div>
 
@@ -94,10 +100,10 @@ export default function PingModal({ vaultAddress, onClose }: PingModalProps) {
               {isLoading ? (
                 <span className="flex items-center justify-center">
                   <span className="animate-spin mr-2">⏳</span>
-                  {isConfirming ? 'Confirming...' : 'Pinging...'}
+                  {isConfirming ? "Confirming..." : "Pinging..."}
                 </span>
               ) : (
-                'Ping'
+                "Ping"
               )}
             </button>
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 export interface CountdownTime {
   days: number;
@@ -15,7 +15,10 @@ export interface CountdownTime {
  * @param timeout - Timeout duration in seconds
  * @returns Countdown information with updates every second
  */
-export function useCountdown(lastPing?: bigint, timeout?: bigint): CountdownTime {
+export function useCountdown(
+  lastPing?: bigint,
+  timeout?: bigint
+): CountdownTime {
   const [countdown, setCountdown] = useState<CountdownTime>({
     days: 0,
     hours: 0,
@@ -32,7 +35,7 @@ export function useCountdown(lastPing?: bigint, timeout?: bigint): CountdownTime
       const now = Math.floor(Date.now() / 1000);
       const lastPingSeconds = Number(lastPing);
       const timeoutSeconds = Number(timeout);
-      
+
       const elapsed = now - lastPingSeconds;
       const remaining = timeoutSeconds - elapsed;
 
@@ -80,7 +83,7 @@ export function useCountdown(lastPing?: bigint, timeout?: bigint): CountdownTime
  */
 export function formatCountdown(countdown: CountdownTime): string {
   if (countdown.isExpired) {
-    return 'Expired';
+    return "Expired";
   }
 
   if (countdown.days > 0) {
@@ -103,14 +106,22 @@ export function formatCountdown(countdown: CountdownTime): string {
  */
 export function formatCountdownFull(countdown: CountdownTime): string {
   if (countdown.isExpired) {
-    return 'Expired';
+    return "Expired";
   }
 
   const parts: string[] = [];
-  if (countdown.days > 0) parts.push(`${countdown.days} day${countdown.days !== 1 ? 's' : ''}`);
-  if (countdown.hours > 0) parts.push(`${countdown.hours} hour${countdown.hours !== 1 ? 's' : ''}`);
-  if (countdown.minutes > 0) parts.push(`${countdown.minutes} minute${countdown.minutes !== 1 ? 's' : ''}`);
-  if (countdown.seconds > 0 || parts.length === 0) parts.push(`${countdown.seconds} second${countdown.seconds !== 1 ? 's' : ''}`);
+  if (countdown.days > 0)
+    parts.push(`${countdown.days} day${countdown.days !== 1 ? "s" : ""}`);
+  if (countdown.hours > 0)
+    parts.push(`${countdown.hours} hour${countdown.hours !== 1 ? "s" : ""}`);
+  if (countdown.minutes > 0)
+    parts.push(
+      `${countdown.minutes} minute${countdown.minutes !== 1 ? "s" : ""}`
+    );
+  if (countdown.seconds > 0 || parts.length === 0)
+    parts.push(
+      `${countdown.seconds} second${countdown.seconds !== 1 ? "s" : ""}`
+    );
 
-  return parts.slice(0, 2).join(', ');
+  return parts.slice(0, 2).join(", ");
 }

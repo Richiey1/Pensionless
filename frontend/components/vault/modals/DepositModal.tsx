@@ -1,58 +1,63 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useWaitForTransactionReceipt } from 'wagmi';
-import { useDeadmanVault } from '@/hooks/useDeadmanVault';
-import { useToast } from '@/context/ToastContext';
-import { parseEther, isAddress, type Address } from 'viem';
-import { NETWORK_CONFIG } from '@/config/constants';
+import { useState, useEffect } from "react";
+import { useWaitForTransactionReceipt } from "wagmi";
+import { useDeadmanVault } from "@/hooks/useDeadmanVault";
+import { useToast } from "@/context/ToastContext";
+import { parseEther, isAddress, type Address } from "viem";
+import { NETWORK_CONFIG } from "@/config/constants";
 
 interface DepositModalProps {
   vaultAddress: Address;
   onClose: () => void;
 }
 
-export default function DepositModal({ vaultAddress, onClose }: DepositModalProps) {
-  const [amount, setAmount] = useState('');
-  const { deposit, hash, isPending, isSuccess, error } = useDeadmanVault(vaultAddress);
+export default function DepositModal({
+  vaultAddress,
+  onClose,
+}: DepositModalProps) {
+  const [amount, setAmount] = useState("");
+  const { deposit, hash, isPending, isSuccess, error } =
+    useDeadmanVault(vaultAddress);
   const { addToast } = useToast();
 
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
-    hash,
-  });
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({
+      hash,
+    });
 
   const isLoading = isPending || isConfirming;
 
   // Show toast notifications for state changes
   useEffect(() => {
     if (isConfirmed) {
-      addToast(`Successfully deposited ${amount} ETH`, 'success');
+      addToast(`Successfully deposited ${amount} ETH`, "success");
     }
   }, [isConfirmed, amount, addToast]);
 
   useEffect(() => {
     if (error) {
-      addToast(`Error: ${error.message}`, 'error', 5000);
+      addToast(`Error: ${error.message}`, "error", 5000);
     }
   }, [error, addToast]);
 
   useEffect(() => {
     if (isPending) {
-      addToast('Transaction pending...', 'info', 0);
+      addToast("Transaction pending...", "info", 0);
     }
   }, [isPending, addToast]);
 
   const handleDeposit = async () => {
     if (!amount || parseFloat(amount) <= 0) {
-      addToast('Please enter a valid amount', 'warning');
+      addToast("Please enter a valid amount", "warning");
       return;
     }
 
     try {
       await deposit(amount);
     } catch (err) {
-      console.error('Error depositing:', err);
-      addToast('Failed to initiate deposit', 'error', 5000);
+      console.error("Error depositing:", err);
+      addToast("Failed to initiate deposit", "error", 5000);
     }
   };
 
@@ -74,8 +79,12 @@ export default function DepositModal({ vaultAddress, onClose }: DepositModalProp
           <div className="space-y-4">
             <div className="p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-center">
               <div className="text-4xl mb-2">✓</div>
-              <p className="text-green-300 font-semibold">Deposit Successful!</p>
-              <p className="text-sm text-green-200 mt-2">{amount} ETH deposited</p>
+              <p className="text-green-300 font-semibold">
+                Deposit Successful!
+              </p>
+              <p className="text-sm text-green-200 mt-2">
+                {amount} ETH deposited
+              </p>
             </div>
             <button
               onClick={onClose}
@@ -110,10 +119,10 @@ export default function DepositModal({ vaultAddress, onClose }: DepositModalProp
               {isLoading ? (
                 <span className="flex items-center justify-center">
                   <span className="animate-spin mr-2">⏳</span>
-                  {isConfirming ? 'Confirming...' : 'Depositing...'}
+                  {isConfirming ? "Confirming..." : "Depositing..."}
                 </span>
               ) : (
-                'Deposit'
+                "Deposit"
               )}
             </button>
 

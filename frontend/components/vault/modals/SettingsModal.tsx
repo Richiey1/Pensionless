@@ -1,93 +1,110 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useWaitForTransactionReceipt } from 'wagmi';
-import { useDeadmanVault, useVaultState } from '@/hooks/useDeadmanVault';
-import { useToast } from '@/context/ToastContext';
-import { isAddress, type Address } from 'viem';
-import { NETWORK_CONFIG } from '@/config/constants';
+import { useState, useEffect } from "react";
+import { useWaitForTransactionReceipt } from "wagmi";
+import { useDeadmanVault, useVaultState } from "@/hooks/useDeadmanVault";
+import { useToast } from "@/context/ToastContext";
+import { isAddress, type Address } from "viem";
+import { NETWORK_CONFIG } from "@/config/constants";
 
 interface SettingsModalProps {
   vaultAddress: Address;
   onClose: () => void;
 }
 
-type SettingType = 'beneficiary' | 'timeout' | null;
+type SettingType = "beneficiary" | "timeout" | null;
 
-export default function SettingsModal({ vaultAddress, onClose }: SettingsModalProps) {
+export default function SettingsModal({
+  vaultAddress,
+  onClose,
+}: SettingsModalProps) {
   const { vaultState, isLoading: isLoadingVault } = useVaultState(vaultAddress);
-  const { setBeneficiary, setTimeout: setTimeoutFn, hash, isPending, error } = useDeadmanVault(vaultAddress);
-  const { addToast } = useToast();
-  
-  const [activeSetting, setActiveSetting] = useState<SettingType>(null);
-  const [beneficiaryInput, setBeneficiaryInput] = useState('');
-  const [timeoutInput, setTimeoutInput] = useState('');
-
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+  const {
+    setBeneficiary,
+    setTimeout: setTimeoutFn,
     hash,
-  });
+    isPending,
+    error,
+  } = useDeadmanVault(vaultAddress);
+  const { addToast } = useToast();
+
+  const [activeSetting, setActiveSetting] = useState<SettingType>(null);
+  const [beneficiaryInput, setBeneficiaryInput] = useState("");
+  const [timeoutInput, setTimeoutInput] = useState("");
+
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({
+      hash,
+    });
 
   const isLoading = isPending || isConfirming || isLoadingVault;
 
   // Show toast notifications
   useEffect(() => {
     if (isConfirmed) {
-      if (activeSetting === 'beneficiary') {
-        addToast('Beneficiary updated successfully', 'success');
-      } else if (activeSetting === 'timeout') {
-        addToast('Timeout updated successfully', 'success');
+      if (activeSetting === "beneficiary") {
+        addToast("Beneficiary updated successfully", "success");
+      } else if (activeSetting === "timeout") {
+        addToast("Timeout updated successfully", "success");
       }
     }
   }, [isConfirmed, activeSetting, addToast]);
 
   useEffect(() => {
     if (error) {
-      addToast(`Error: ${error.message}`, 'error', 5000);
+      addToast(`Error: ${error.message}`, "error", 5000);
     }
   }, [error, addToast]);
 
   useEffect(() => {
     if (isPending) {
-      addToast('Transaction pending...', 'info', 0);
+      addToast("Transaction pending...", "info", 0);
     }
   }, [isPending, addToast]);
 
   const handleSetBeneficiary = async () => {
     if (!isAddress(beneficiaryInput)) {
-      addToast('Please enter a valid Ethereum address', 'warning');
+      addToast("Please enter a valid Ethereum address", "warning");
       return;
     }
 
     try {
       await setBeneficiary(beneficiaryInput as Address);
-      setBeneficiaryInput('');
+      setBeneficiaryInput("");
       setActiveSetting(null);
     } catch (err) {
-      console.error('Error setting beneficiary:', err);
-      addToast('Failed to set beneficiary', 'error', 5000);
+      console.error("Error setting beneficiary:", err);
+      addToast("Failed to set beneficiary", "error", 5000);
     }
   };
 
   const handleSetTimeout = async () => {
-    if (!timeoutInput || isNaN(Number(timeoutInput)) || Number(timeoutInput) <= 0) {
-      addToast('Please enter a valid timeout in seconds', 'warning');
+    if (
+      !timeoutInput ||
+      isNaN(Number(timeoutInput)) ||
+      Number(timeoutInput) <= 0
+    ) {
+      addToast("Please enter a valid timeout in seconds", "warning");
       return;
     }
 
     try {
       await setTimeoutFn(BigInt(timeoutInput));
-      setTimeoutInput('');
+      setTimeoutInput("");
       setActiveSetting(null);
     } catch (err) {
-      console.error('Error setting timeout:', err);
-      addToast('Failed to set timeout', 'error', 5000);
+      console.error("Error setting timeout:", err);
+      addToast("Failed to set timeout", "error", 5000);
     }
   };
 
-  const formatAddress = (addr: string) => `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+  const formatAddress = (addr: string) =>
+    `${addr.slice(0, 6)}...${addr.slice(-4)}`;
   const formatSeconds = (seconds: bigint) => {
     const days = Number(seconds) / (24 * 60 * 60);
-    return days < 1 ? `${Math.floor(Number(seconds) / 3600)} hours` : `${Math.floor(days)} days`;
+    return days < 1
+      ? `${Math.floor(Number(seconds) / 3600)} hours`
+      : `${Math.floor(days)} days`;
   };
 
   return (
@@ -109,7 +126,9 @@ export default function SettingsModal({ vaultAddress, onClose }: SettingsModalPr
             <div className="p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-center">
               <div className="text-4xl mb-2">✓</div>
               <p className="text-green-300 font-semibold">Settings Updated!</p>
-              <p className="text-sm text-green-200 mt-2">Your vault settings have been changed</p>
+              <p className="text-sm text-green-200 mt-2">
+                Your vault settings have been changed
+              </p>
             </div>
             <button
               onClick={onClose}
@@ -125,14 +144,16 @@ export default function SettingsModal({ vaultAddress, onClose }: SettingsModalPr
               <div className="space-y-3">
                 {/* Beneficiary */}
                 <div className="p-3 bg-[#1E293B] border border-[#3B82F6]/20 rounded-lg">
-                  <p className="text-sm text-gray-400 mb-1">Current Beneficiary</p>
+                  <p className="text-sm text-gray-400 mb-1">
+                    Current Beneficiary
+                  </p>
                   <p className="text-white font-mono text-sm mb-2">
                     {formatAddress(vaultState.beneficiary)}
                   </p>
-                  {activeSetting !== 'beneficiary' ? (
+                  {activeSetting !== "beneficiary" ? (
                     <button
                       onClick={() => {
-                        setActiveSetting('beneficiary');
+                        setActiveSetting("beneficiary");
                         setBeneficiaryInput(vaultState.beneficiary);
                       }}
                       disabled={isLoading}
@@ -176,10 +197,10 @@ export default function SettingsModal({ vaultAddress, onClose }: SettingsModalPr
                   <p className="text-white font-semibold text-sm mb-2">
                     {formatSeconds(vaultState.timeout)}
                   </p>
-                  {activeSetting !== 'timeout' ? (
+                  {activeSetting !== "timeout" ? (
                     <button
                       onClick={() => {
-                        setActiveSetting('timeout');
+                        setActiveSetting("timeout");
                         setTimeoutInput(vaultState.timeout.toString());
                       }}
                       disabled={isLoading}
