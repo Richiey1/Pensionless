@@ -1,16 +1,20 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useMemo } from 'react';
-import { useAccount } from 'wagmi';
-import { useUserVaults } from '@/hooks/useFactory';
-import { useVaultState, useDeadmanVault, useIsTimeoutReached } from '@/hooks/useDeadmanVault';
-import { useCountdown, formatCountdown } from '@/hooks/useCountdown';
-import { formatEther, type Address } from 'viem';
-import { NETWORK_CONFIG } from '@/config/constants';
-import DepositModal from './modals/DepositModal';
-import WithdrawModal from './modals/WithdrawModal';
-import PingModal from './modals/PingModal';
-import SettingsModal from './modals/SettingsModal';
+import { useState, useEffect, useMemo } from "react";
+import { useAccount } from "wagmi";
+import { useUserVaults } from "@/hooks/useFactory";
+import {
+  useVaultState,
+  useDeadmanVault,
+  useIsTimeoutReached,
+} from "@/hooks/useDeadmanVault";
+import { useCountdown, formatCountdown } from "@/hooks/useCountdown";
+import { formatEther, type Address } from "viem";
+import { NETWORK_CONFIG } from "@/config/constants";
+import DepositModal from "./modals/DepositModal";
+import WithdrawModal from "./modals/WithdrawModal";
+import PingModal from "./modals/PingModal";
+import SettingsModal from "./modals/SettingsModal";
 
 interface VaultCardData {
   address: Address;
@@ -22,15 +26,41 @@ interface VaultCardData {
   isTimeoutReached: boolean;
 }
 
-// Individual vault card component to handle its own countdown
-function VaultCard({ vault, onDeposit, onWithdraw, onPing, onSettings }: {
-  vault: VaultCardData;
+// Individual vault card component that fetches its own data
+function VaultCard({
+  address,
+  onDeposit,
+  onWithdraw,
+  onPing,
+  onSettings,
+}: {
+  address: Address;
   onDeposit: () => void;
   onWithdraw: () => void;
   onPing: () => void;
   onSettings: () => void;
 }) {
-  const countdown = useCountdown(vault.lastPing, vault.timeout);
+  const { vaultState, isLoading: isLoadingState } = useVaultState(address);
+  const { isTimeoutReached, isLoading: isLoadingTimeout } =
+    useIsTimeoutReached(address);
+
+  const isLoading = isLoadingState || isLoadingTimeout;
+
+  if (isLoading || !vaultState) {
+    return (
+      <div className="bg-[#1E293B]/50 rounded-xl p-6 border border-[#3B82F6]/20 animate-pulse">
+        <div className="h-6 bg-[#3B82F6]/20 rounded w-1/3 mb-4"></div>
+        <div className="h-4 bg-[#3B82F6]/20 rounded w-1/2 mb-4"></div>
+        <div className="grid grid-cols-4 gap-2">
+          {[1, 2, 3, 4].map((j) => (
+            <div key={j} className="h-10 bg-[#3B82F6]/20 rounded"></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const countdown = useCountdown(vaultState.lastPing, vaultState.timeout);
 
   const formatTimeAgo = (timestamp: bigint) => {
     const seconds = Math.floor((Date.now() - Number(timestamp) * 1000) / 1000);
@@ -49,15 +79,15 @@ function VaultCard({ vault, onDeposit, onWithdraw, onPing, onSettings }: {
     <div
       className={`bg-[#1E293B]/50 backdrop-blur-sm rounded-xl p-6 border transition-colors ${
         countdown.isExpired
-          ? 'border-red-500/40 hover:border-red-500/60'
-          : 'border-[#3B82F6]/20 hover:border-[#14B8A6]/40'
+          ? "border-red-500/40 hover:border-red-500/60"
+          : "border-[#3B82F6]/20 hover:border-[#14B8A6]/40"
       }`}
     >
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <h3 className="text-lg font-semibold text-white">
-              Vault {shortAddress(vault.address)}
+              Vault {shortAddress(address)}
             </h3>
             {countdown.isExpired && (
               <span className="px-2 py-1 bg-red-500/20 text-red-300 text-xs rounded font-medium">
@@ -66,14 +96,18 @@ function VaultCard({ vault, onDeposit, onWithdraw, onPing, onSettings }: {
             )}
           </div>
           <p className="text-sm text-gray-400">
-            Last ping: {formatTimeAgo(vault.lastPing)}
+            Last ping: {formatTimeAgo(vaultState.lastPing)}
           </p>
         </div>
         <div className="mt-3 sm:mt-0 text-right">
           <div className="text-2xl font-bold text-[#5EEAD4]">
-            {formatEther(vault.balance)} ETH
+            {formatEther(vaultState.balance)} ETH
           </div>
-          <div className={`text-sm font-semibold ${countdown.isExpired ? 'text-red-400' : 'text-[#14B8A6]'}`}>
+          <div
+            className={`text-sm font-semibold ${
+              countdown.isExpired ? "text-red-400" : "text-[#14B8A6]"
+            }`}
+          >
             {formatCountdown(countdown)}
           </div>
         </div>
@@ -81,7 +115,9 @@ function VaultCard({ vault, onDeposit, onWithdraw, onPing, onSettings }: {
 
       <div className="mb-4 p-3 bg-[#0F172A]/50 rounded-lg">
         <p className="text-sm text-gray-400">Beneficiary</p>
-        <p className="text-white font-mono text-sm">{shortAddress(vault.beneficiary)}</p>
+        <p className="text-white font-mono text-sm">
+          {shortAddress(vaultState.beneficiary)}
+        </p>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -93,7 +129,7 @@ function VaultCard({ vault, onDeposit, onWithdraw, onPing, onSettings }: {
         </button>
         <button
           onClick={onWithdraw}
-          disabled={vault.balance === BigInt(0)}
+          disabled={vaultState.balance === BigInt(0)}
           className="px-4 py-2 bg-[#0F172A] border border-[#3B82F6]/30 text-white rounded-lg hover:border-[#14B8A6] transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Withdraw
@@ -113,7 +149,7 @@ function VaultCard({ vault, onDeposit, onWithdraw, onPing, onSettings }: {
       </div>
 
       <a
-        href={`${NETWORK_CONFIG.explorerUrl}/address/${vault.address}`}
+        href={`${NETWORK_CONFIG.explorerUrl}/address/${address}`}
         target="_blank"
         rel="noopener noreferrer"
         className="mt-3 text-xs text-blue-400 hover:text-blue-300 block"
@@ -126,55 +162,20 @@ function VaultCard({ vault, onDeposit, onWithdraw, onPing, onSettings }: {
 
 export default function MyVaultsTab() {
   const { address, isConnected } = useAccount();
-  const { vaults: vaultAddresses, isLoading: isLoadingVaults, error: errorVaults, refetch } = useUserVaults(address);
-  
-  const [selectedVaultAddress, setSelectedVaultAddress] = useState<Address | null>(null);
-  const [vaultsData, setVaultsData] = useState<VaultCardData[]>([]);
-  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
-  
+  const {
+    vaults: vaultAddresses,
+    isLoading: isLoadingVaults,
+    error: errorVaults,
+    refetch,
+  } = useUserVaults(address);
+
+  const [selectedVaultAddress, setSelectedVaultAddress] =
+    useState<Address | null>(null);
+
   // Modal states
-  const [activeModal, setActiveModal] = useState<'deposit' | 'withdraw' | 'ping' | 'settings' | null>(null);
-
-  // Fetch details for each vault
-  const vaultDetailsQueries = useMemo(() => {
-    if (!vaultAddresses || vaultAddresses.length === 0) return [];
-    return (vaultAddresses as Address[]).map(vaultAddress => ({
-      useVaultState: useVaultState(vaultAddress),
-      useIsTimeoutReached: useIsTimeoutReached(vaultAddress),
-      address: vaultAddress,
-    }));
-  }, [vaultAddresses]);
-
-  // Combine vault data
-  useEffect(() => {
-    if (!vaultDetailsQueries || vaultDetailsQueries.length === 0) {
-      setVaultsData([]);
-      return;
-    }
-
-    const allLoaded = vaultDetailsQueries.every(
-      q => !q.useVaultState.isLoading && !q.useIsTimeoutReached.isLoading
-    );
-
-    if (allLoaded) {
-      const data = vaultDetailsQueries
-        .map(q => ({
-          address: q.address,
-          owner: q.useVaultState.vaultState?.owner || ('0x0' as Address),
-          beneficiary: q.useVaultState.vaultState?.beneficiary || ('0x0' as Address),
-          lastPing: q.useVaultState.vaultState?.lastPing || BigInt(0),
-          timeout: q.useVaultState.vaultState?.timeout || BigInt(0),
-          balance: q.useVaultState.vaultState?.balance || BigInt(0),
-          isTimeoutReached: q.useIsTimeoutReached.isTimeoutReached || false,
-        }))
-        .filter(v => v.owner !== '0x0');
-
-      setVaultsData(data);
-      setIsLoadingDetails(false);
-    } else {
-      setIsLoadingDetails(true);
-    }
-  }, [vaultDetailsQueries]);
+  const [activeModal, setActiveModal] = useState<
+    "deposit" | "withdraw" | "ping" | "settings" | null
+  >(null);
 
   const handleModalClose = () => {
     setActiveModal(null);
@@ -188,8 +189,12 @@ export default function MyVaultsTab() {
       <div className="max-w-4xl mx-auto p-6 sm:p-8">
         <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-8 text-center">
           <div className="text-5xl mb-4">⚠️</div>
-          <h3 className="text-xl font-semibold text-yellow-900 mb-2">Wallet Not Connected</h3>
-          <p className="text-yellow-800">Please connect your wallet to view your vaults</p>
+          <h3 className="text-xl font-semibold text-yellow-900 mb-2">
+            Wallet Not Connected
+          </h3>
+          <p className="text-yellow-800">
+            Please connect your wallet to view your vaults
+          </p>
         </div>
       </div>
     );
@@ -199,12 +204,15 @@ export default function MyVaultsTab() {
     return (
       <div className="max-w-4xl mx-auto p-6 sm:p-8">
         <div className="space-y-4">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="bg-[#1E293B]/50 rounded-xl p-6 border border-[#3B82F6]/20 animate-pulse">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="bg-[#1E293B]/50 rounded-xl p-6 border border-[#3B82F6]/20 animate-pulse"
+            >
               <div className="h-6 bg-[#3B82F6]/20 rounded w-1/3 mb-4"></div>
               <div className="h-4 bg-[#3B82F6]/20 rounded w-1/2 mb-4"></div>
               <div className="grid grid-cols-4 gap-2">
-                {[1, 2, 3, 4].map(j => (
+                {[1, 2, 3, 4].map((j) => (
                   <div key={j} className="h-10 bg-[#3B82F6]/20 rounded"></div>
                 ))}
               </div>
@@ -220,8 +228,12 @@ export default function MyVaultsTab() {
       <div className="max-w-4xl mx-auto p-6 sm:p-8">
         <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center">
           <div className="text-5xl mb-4">❌</div>
-          <h3 className="text-xl font-semibold text-red-900 mb-2">Error Loading Vaults</h3>
-          <p className="text-red-800 mb-4">{errorVaults?.message || 'Failed to load vaults'}</p>
+          <h3 className="text-xl font-semibold text-red-900 mb-2">
+            Error Loading Vaults
+          </h3>
+          <p className="text-red-800 mb-4">
+            {errorVaults?.message || "Failed to load vaults"}
+          </p>
           <button
             onClick={() => refetch()}
             className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
@@ -237,11 +249,15 @@ export default function MyVaultsTab() {
     <div className="max-w-4xl mx-auto p-6 sm:p-8">
       <h2 className="text-2xl font-bold text-white mb-6">My Vaults</h2>
 
-      {vaultsData.length === 0 ? (
+      {!vaultAddresses || vaultAddresses.length === 0 ? (
         <div className="bg-[#1E293B]/50 backdrop-blur-sm rounded-xl p-12 border border-[#3B82F6]/20 text-center">
           <div className="text-6xl mb-4">🔐</div>
-          <h3 className="text-xl font-semibold text-white mb-2">No Vaults Yet</h3>
-          <p className="text-gray-400 mb-6">Create your first vault to get started</p>
+          <h3 className="text-xl font-semibold text-white mb-2">
+            No Vaults Yet
+          </h3>
+          <p className="text-gray-400 mb-6">
+            Create your first vault to get started
+          </p>
           <a
             href="/?tab=create"
             className="inline-block px-6 py-3 bg-gradient-to-r from-[#3B82F6] to-[#14B8A6] text-white font-semibold rounded-lg hover:opacity-90 transition-opacity"
@@ -251,25 +267,25 @@ export default function MyVaultsTab() {
         </div>
       ) : (
         <div className="space-y-4">
-          {vaultsData.map((vault) => (
+          {(vaultAddresses as Address[]).map((vaultAddress) => (
             <VaultCard
-              key={vault.address}
-              vault={vault}
+              key={vaultAddress}
+              address={vaultAddress}
               onDeposit={() => {
-                setSelectedVaultAddress(vault.address);
-                setActiveModal('deposit');
+                setSelectedVaultAddress(vaultAddress);
+                setActiveModal("deposit");
               }}
               onWithdraw={() => {
-                setSelectedVaultAddress(vault.address);
-                setActiveModal('withdraw');
+                setSelectedVaultAddress(vaultAddress);
+                setActiveModal("withdraw");
               }}
               onPing={() => {
-                setSelectedVaultAddress(vault.address);
-                setActiveModal('ping');
+                setSelectedVaultAddress(vaultAddress);
+                setActiveModal("ping");
               }}
               onSettings={() => {
-                setSelectedVaultAddress(vault.address);
-                setActiveModal('settings');
+                setSelectedVaultAddress(vaultAddress);
+                setActiveModal("settings");
               }}
             />
           ))}
@@ -279,17 +295,29 @@ export default function MyVaultsTab() {
       {/* Modals */}
       {selectedVaultAddress && (
         <>
-          {activeModal === 'deposit' && (
-            <DepositModal vaultAddress={selectedVaultAddress} onClose={handleModalClose} />
+          {activeModal === "deposit" && (
+            <DepositModal
+              vaultAddress={selectedVaultAddress}
+              onClose={handleModalClose}
+            />
           )}
-          {activeModal === 'withdraw' && (
-            <WithdrawModal vaultAddress={selectedVaultAddress} onClose={handleModalClose} />
+          {activeModal === "withdraw" && (
+            <WithdrawModal
+              vaultAddress={selectedVaultAddress}
+              onClose={handleModalClose}
+            />
           )}
-          {activeModal === 'ping' && (
-            <PingModal vaultAddress={selectedVaultAddress} onClose={handleModalClose} />
+          {activeModal === "ping" && (
+            <PingModal
+              vaultAddress={selectedVaultAddress}
+              onClose={handleModalClose}
+            />
           )}
-          {activeModal === 'settings' && (
-            <SettingsModal vaultAddress={selectedVaultAddress} onClose={handleModalClose} />
+          {activeModal === "settings" && (
+            <SettingsModal
+              vaultAddress={selectedVaultAddress}
+              onClose={handleModalClose}
+            />
           )}
         </>
       )}
