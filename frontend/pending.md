@@ -101,7 +101,7 @@ NFT:     0xc319b525592725194cA6254EE09866AA7b1bD5Ab
 - [x] Success notifications ✅
 - [x] Transaction pending indicators ✅
 - [x] Responsive design for mobile ✅
-- [ ] Tooltips for complex features
+- [x] Tooltips for complex features ✅
 - [x] Input validation ✅
 
 ### 5. Smart Contract Setup
