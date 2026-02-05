@@ -1,12 +1,12 @@
-# Freelancer Savings Platform - Frontend Roadmap
+# Pension< - Frontend Roadmap
 
-This roadmap details the comprehensive UI/UX development path for the Freelancer Savings Platform. Our goal is to provide a seamless, intuitive dashboard that makes financial planning effortless for independent workers.
+This roadmap details the comprehensive UI/UX development path for the **pensionless** frontend. Our goal is to provide a seamless, intuitive dashboard that makes financial planning effortless for independent workers.
 
 ## ✅ Phase 1: Core Interface (Completed)
 
 ### Issue #1: Legacy Inheritance Dashboard
 - **Status**: ✅ COMPLETED
-- **Description**: Established the basic infrastructure for vault management and deadman switch logic.
+- **Description**: Established the basic infrastructure for vault management and deadman switch logic within **pensionless**.
 - [x] **Web3 Integration**: Wagmi/Viem/Reown AppKit setup for secure wallet interaction.
 - [x] **Vault Management**: UI for Ping, Deposit, Withdraw (ETH support).
 - [x] **Beneficiary Flow**: Claim interface for heirs and ProofOfClaimNFT certificate viewer.
@@ -18,14 +18,14 @@ This roadmap details the comprehensive UI/UX development path for the Freelancer
 
 ### Issue #2: Global Savings Dashboard
 - **Status**: ❌ PENDING | **Priority**: CRITICAL
-- **Description**: A unified view of the freelancer's financial health across all vaults and tokens.
+- **Description**: A unified view of the freelancer's financial health across all **pensionless** vaults and tokens.
 - [ ] **Stats Overview**: Create high-level cards for "Total Balance (USD)", "Net Yield Earned", and "Monthly Savings Rate".
 - [ ] **Asset Allocation Chart**: Implement a visual breakdown (Pie Chart using Recharts) of Stablecoins (USDC/USDT) vs. ETH.
 - [ ] **Growth Projections**: Develop an interactive line chart showing projected retirement savings over 5, 10, and 20 years based on current DeFi APY.
 
 ### Issue #3: Allocation Engine UI
 - **Status**: ❌ PENDING | **Priority**: HIGH
-- **Description**: User-friendly controls for the auto-income-splitting mechanism.
+- **Description**: User-friendly controls for the **pensionless** auto-income-splitting mechanism.
 - [ ] **Interactive Sliders**: Develop a precision slider component to adjust "Spendable" vs. "Savings" percentages.
 - [ ] **Income Routing Instructions**: Design a prominent "Client Payment Portal" section showing the unique vault address and QR code for direct income routing.
 - [ ] **Split History**: Create a dedicated ledger listing all recent auto-splits and their final destinations.
@@ -36,7 +36,7 @@ This roadmap details the comprehensive UI/UX development path for the Freelancer
 
 ### Issue #4: DeFi Strategy Manager
 - **Status**: ❌ PENDING | **Priority**: HIGH
-- **Description**: Interface for users to select and monitor their yield generation strategies.
+- **Description**: Interface for users to select and monitor their yield generation strategies within **pensionless**.
 - [ ] **Strategy Tiers**: Design comparative cards for Conservative (Stablecoin Lending), Balanced (Index tokens), and Growth (Liquidity Provision).
 - [ ] **Performance Monitor**: Add real-time APY tracking for each deployed strategy.
 - [ ] **Emergency Liquidate**: Implement a high-visibility button to instantly exit all DeFi positions and return funds to the secure vault.
@@ -54,7 +54,7 @@ This roadmap details the comprehensive UI/UX development path for the Freelancer
 
 ### Issue #6: Notification & Reminder System
 - **Status**: ❌ PENDING | **Priority**: HIGH
-- **Description**: Ensure users never miss a "Ping" or an inheritance claim window.
+- **Description**: Ensure **pensionless** users never miss a "Ping" or an inheritance claim window.
 - [ ] **Security Alerts**: Integration with Push Protocol or XMTP for browser-based "Inactivity Warnings".
 - [ ] **Reminders**: Configurable email/SMS alerts to remind users to reset their deadman switch timer.
 - [ ] **Transaction Feedback**: Enhance real-time toast notifications for multi-stage transactions (Approve -> Deposit -> Route).
@@ -73,4 +73,4 @@ This roadmap details the comprehensive UI/UX development path for the Freelancer
 - [ ] **Tax Reporting**: One-click generation of exportable CSV files for freelancer annual tax filings.
 
 ---
-**Building the default financial safety net for the global freelance workforce.**
+**Building the default financial safety net for the global freelance workforce with pensionless.**
