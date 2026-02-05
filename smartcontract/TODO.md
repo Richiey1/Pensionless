@@ -1,6 +1,6 @@
-# Freelancer Savings Platform - Smart Contract Roadmap
+# Pension< - Smart Contract Roadmap
 
-This document outlines the comprehensive development plan for the Freelancer Savings Platform smart contracts. The goal is to build a robust, secure, and automated financial infrastructure for the global freelance workforce.
+This document outlines the comprehensive development plan for the **pensionless** smart contracts. The goal is to build a robust, secure, and automated financial infrastructure for the global freelance workforce.
 
 ## ✅ Phase 1: Core Security (Completed)
 
@@ -18,7 +18,7 @@ This document outlines the comprehensive development plan for the Freelancer Sav
 
 ### Issue #2: ERC-20 Multi-Asset Support
 - **Status**: ❌ PENDING | **Priority**: CRITICAL
-- **Description**: Transition the vault from ETH-only to a multi-token system supporting USDC, USDT, and DAI.
+- **Description**: Transition the **pensionless** vault from ETH-only to a multi-token system supporting USDC, USDT, and DAI.
 - [ ] **Interface Integration**: Add `IERC20` and `SafeERC20` support.
 - [ ] **Asset Registry**: Implement a whitelist of supported stablecoins in the Factory.
 - [ ] **Multi-Asset Withdrawals**: Update `withdraw()` and `claimAll()` to loop through or specify token addresses.
@@ -46,7 +46,7 @@ This document outlines the comprehensive development plan for the Freelancer Sav
 
 ### Issue #5: Yield Tracking & Compounding
 - **Status**: ❌ PENDING | **Priority**: MEDIUM
-- **Description**: On-chain logic to track how much interest has been generated.
+- **Description**: On-chain logic to track how much interest has been generated within **pensionless**.
 - [ ] **Snapshotting**: Record total assets vs. initial principal on every interaction.
 - [ ] **Performance Events**: Emit events with `principal` and `yield` values for indexing.
 - [ ] **Auto-Compounding**: Ensure rewards (like AAVE/COMP) are claimed and swapped back into the base stablecoin.
@@ -57,14 +57,14 @@ This document outlines the comprehensive development plan for the Freelancer Sav
 
 ### Issue #6: The Graph (Subgraph) Integration
 - **Status**: ❌ PENDING | **Priority**: MEDIUM
-- **Description**: Off-chain data indexing for a high-performance frontend.
+- **Description**: Off-chain data indexing for a high-performance **pensionless** frontend.
 - [ ] **Schema Definition**: Define `Vault`, `Transaction`, `Ping`, and `Inheritance` entities.
 - [ ] **Event Mapping**: Write handlers for all contract events (Deposits, Splits, Claims).
 - [ ] **Deployment**: Host on The Graph Studio and point the frontend to the new endpoint.
 
 ### Issue #7: Gas Optimization & Security Hardening
 - **Status**: ❌ PENDING | **Priority**: HIGH
-- **Description**: Ensure the platform is affordable for micro-savings and secure against edge cases.
+- **Description**: Ensure the **pensionless** platform is affordable for micro-savings and secure against edge cases.
 - [ ] **Storage Packing**: Optimize `VaultState` struct to fit in fewer 256-bit slots.
 - [ ] **Reentrancy Review**: Audit all external protocol calls for cross-contract reentrancy.
 - [ ] **Emergency Admin**: Implement a "Guardian" role in the Factory for emergency pauses (if needed).
