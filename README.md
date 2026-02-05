@@ -1,10 +1,10 @@
-# Freelancer Savings Platform
+# Pension<
 
 On-chain savings and retirement infrastructure for freelancers and independent workers, featuring automated inheritance security via the **Deadman Switch**.
 
 ## 🎯 Overview
 
-The Freelancer Savings Platform is a decentralized vault system on the Base blockchain designed to help freelancers build long-term financial security. It addresses the lack of traditional retirement infrastructure for independent workers by providing programmable savings, auto-allocation of income, and automated inheritance modules.
+**pensionless** is a decentralized vault system on the Base blockchain designed to help freelancers build long-term financial security. It addresses the lack of traditional retirement infrastructure for independent workers by providing programmable savings, auto-allocation of income, and automated inheritance modules.
 
 ## 🚀 Problem
 
@@ -16,7 +16,7 @@ Freelancers and gig workers face unique financial hurdles:
 
 ## 💡 Solution
 
-Our platform provides a smart contract-based vault system that automatically allocates incoming funds to savings and retirement strategies. By integrating a **Deadman Switch** mechanism, the platform ensuring that your hard-earned savings are safely transferred to a designated beneficiary if you become inactive.
+**pensionless** provides a smart contract-based vault system that automatically allocates incoming funds to savings and retirement strategies. By integrating a **Deadman Switch** mechanism, **pensionless** ensures that your hard-earned savings are safely transferred to a designated beneficiary if you become inactive.
 
 ## ✨ Core Features
 
@@ -55,13 +55,13 @@ Our platform provides a smart contract-based vault system that automatically all
 ## 📖 How It Works
 
 ### 1. Setup & Goal
-Create your personal savings vault and define your savings goal and allocation percentage.
+Create your personal savings vault and define your savings goal and allocation percentage within **pensionless**.
 
 ### 2. Fund & Save
 Deposit assets or route your income through the **Allocation Engine**. A portion is saved instantly while the rest remains liquid.
 
 ### 3. Security Check (The Deadman Switch)
-The platform monitors your "pings" (activity). As long as you stay active, your funds are yours. 
+**pensionless** monitors your "pings" (activity). As long as you stay active, your funds are yours. 
 
 ### 4. Inheritance
 If you stop pinging for your chosen duration, the **Deadman Module** activates, allowing your beneficiary to claim the total savings balance and take ownership of the vault.
@@ -76,4 +76,4 @@ If you stop pinging for your chosen duration, the **Deadman Module** activates, 
 MIT License - Feel free to use and modify.
 
 ---
-**Building the default financial safety net for the global freelance workforce.**
+**Building the default financial safety net for the global freelance workforce with pensionless.**
