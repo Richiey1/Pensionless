@@ -63,9 +63,9 @@ This document outlines the comprehensive development plan for the **pensionless*
 - [ ] **Deployment**: Host on The Graph Studio and point the frontend to the new endpoint.
 
 ### Issue #7: Gas Optimization & Security Hardening
-- **Status**: ❌ PENDING | **Priority**: HIGH
+- **Status**: 🚧 IN_PROGRESS
 - **Description**: Ensure the **pensionless** platform is affordable for micro-savings and secure against edge cases.
-- [ ] **Storage Packing**: Optimize `VaultState` struct to fit in fewer 256-bit slots.
+- [x] **Storage Packing**: Optimize `VaultState` struct (and variables) to fit in fewer 256-bit slots.
 - [ ] **Reentrancy Review**: Audit all external protocol calls for cross-contract reentrancy.
 - [ ] **Emergency Admin**: Implement a "Guardian" role in the Factory for emergency pauses (if needed).
 

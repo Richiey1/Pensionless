@@ -15,10 +15,11 @@ contract DeadmanVault is IDeadmanVault, ReentrancyGuard {
     error TransferFailed();
     
     address private _owner;
-    address private _beneficiary;
-    uint256 private _lastPing;
-    uint256 private _timeout;
     bool private _hasClaimed;
+    uint64 private _lastPing;
+    
+    address private _beneficiary;
+    uint64 private _timeout;
     
     uint256 public constant MIN_TIMEOUT = 1 hours;
     uint256 public constant MAX_TIMEOUT = 10 * 365 days;
@@ -41,8 +42,8 @@ contract DeadmanVault is IDeadmanVault, ReentrancyGuard {
         
         _owner = owner_;
         _beneficiary = beneficiary_;
-        _timeout = timeout_;
-        _lastPing = block.timestamp;
+        _timeout = uint64(timeout_);
+        _lastPing = uint64(block.timestamp);
         _hasClaimed = false;
     }
     
@@ -55,7 +56,7 @@ contract DeadmanVault is IDeadmanVault, ReentrancyGuard {
         if (amount == 0) revert InsufficientBalance();
         if (address(this).balance < amount) revert InsufficientBalance();
         
-        _lastPing = block.timestamp;
+        _lastPing = uint64(block.timestamp);
         
         (bool success, ) = payable(_owner).call{value: amount}("");
         if (!success) revert TransferFailed();
@@ -71,12 +72,12 @@ contract DeadmanVault is IDeadmanVault, ReentrancyGuard {
     
     function setTimeout(uint256 timeout_) external override onlyOwner {
         if (timeout_ < MIN_TIMEOUT || timeout_ > MAX_TIMEOUT) revert InvalidTimeout();
-        _timeout = timeout_;
+        _timeout = uint64(timeout_);
         emit TimeoutSet(timeout_);
     }
     
     function ping() external override onlyOwner {
-        _lastPing = block.timestamp;
+        _lastPing = uint64(block.timestamp);
         emit Pinged(_owner, block.timestamp);
     }
     
@@ -86,7 +87,7 @@ contract DeadmanVault is IDeadmanVault, ReentrancyGuard {
         uint256 vaultBalance = address(this).balance;
         
         _owner = _beneficiary;
-        _lastPing = block.timestamp;
+        _lastPing = uint64(block.timestamp);
         _hasClaimed = true;
         
         if (vaultBalance > 0) {
@@ -101,8 +102,8 @@ contract DeadmanVault is IDeadmanVault, ReentrancyGuard {
         return VaultState({
             owner: _owner,
             beneficiary: _beneficiary,
-            lastPing: _lastPing,
-            timeout: _timeout,
+            lastPing: uint256(_lastPing),
+            timeout: uint256(_timeout),
             hasClaimed: _hasClaimed,
             balance: address(this).balance
         });
@@ -125,11 +126,11 @@ contract DeadmanVault is IDeadmanVault, ReentrancyGuard {
     }
     
     function lastPing() external view override returns (uint256) {
-        return _lastPing;
+        return uint256(_lastPing);
     }
     
     function timeout() external view override returns (uint256) {
-        return _timeout;
+        return uint256(_timeout);
     }
     
     function hasClaimed() external view override returns (bool) {
