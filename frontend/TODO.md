@@ -17,9 +17,9 @@ This roadmap details the comprehensive UI/UX development path for the **pensionl
 ## 🚀 Phase 2: Savings Intelligence (High Priority)
 
 ### Issue #2: Global Savings Dashboard
-- **Status**: ❌ PENDING | **Priority**: CRITICAL
+- **Status**: 🚧 IN_PROGRESS
 - **Description**: A unified view of the freelancer's financial health across all **pensionless** vaults and tokens.
-- [ ] **Stats Overview**: Create high-level cards for "Total Balance (USD)", "Net Yield Earned", and "Monthly Savings Rate".
+- [x] **Stats Overview**: Create high-level cards for "Total Balance (USD)", "Net Yield Earned", and "Monthly Savings Rate".
 - [ ] **Asset Allocation Chart**: Implement a visual breakdown (Pie Chart using Recharts) of Stablecoins (USDC/USDT) vs. ETH.
 - [ ] **Growth Projections**: Develop an interactive line chart showing projected retirement savings over 5, 10, and 20 years based on current DeFi APY.
 
